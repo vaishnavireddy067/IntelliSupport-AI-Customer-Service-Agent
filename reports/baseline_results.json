@@ -1,0 +1,701 @@
+{
+  "experiment_metadata": {
+    "dataset": "Customer Support on Twitter (twcs.csv) - AppleSupport Scope",
+    "train_size": 12000,
+    "test_size": 2500,
+    "intent_taxonomy_size": 10,
+    "random_seed": 42
+  },
+  "intent_classification": {
+    "baseline_majority": {
+      "accuracy": 0.658,
+      "macro_f1": 0.0794,
+      "weighted_f1": 0.5223,
+      "macro_precision": 0.0658,
+      "weighted_precision": 0.433,
+      "macro_recall": 0.1,
+      "weighted_recall": 0.658,
+      "per_intent_report": {
+        "battery_power": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 246.0
+        },
+        "os_update_bug": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 103.0
+        },
+        "screen_display": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 90.0
+        },
+        "apple_id_account": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 66.0
+        },
+        "connectivity_network": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 98.0
+        },
+        "app_store_issues": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 15.0
+        },
+        "billing_subscription": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 35.0
+        },
+        "media_services": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 160.0
+        },
+        "store_hardware_service": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 42.0
+        },
+        "other_general": {
+          "precision": 0.658,
+          "recall": 1.0,
+          "f1-score": 0.7937273823884198,
+          "support": 1645.0
+        },
+        "accuracy": 0.658,
+        "macro avg": {
+          "precision": 0.0658,
+          "recall": 0.1,
+          "f1-score": 0.07937273823884197,
+          "support": 2500.0
+        },
+        "weighted avg": {
+          "precision": 0.432964,
+          "recall": 0.658,
+          "f1-score": 0.5222726176115803,
+          "support": 2500.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          246
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          103
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          90
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          66
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          98
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          15
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          35
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          42
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1645
+        ]
+      ],
+      "labels": [
+        "battery_power",
+        "os_update_bug",
+        "screen_display",
+        "apple_id_account",
+        "connectivity_network",
+        "app_store_issues",
+        "billing_subscription",
+        "media_services",
+        "store_hardware_service",
+        "other_general"
+      ]
+    },
+    "baseline_tfidf_logistic": {
+      "accuracy": 0.8488,
+      "macro_f1": 0.6092,
+      "weighted_f1": 0.8244,
+      "macro_precision": 0.887,
+      "weighted_precision": 0.8554,
+      "macro_recall": 0.5109,
+      "weighted_recall": 0.8488,
+      "per_intent_report": {
+        "battery_power": {
+          "precision": 1.0,
+          "recall": 0.8617886178861789,
+          "f1-score": 0.925764192139738,
+          "support": 246.0
+        },
+        "os_update_bug": {
+          "precision": 0.8148148148148148,
+          "recall": 0.21359223300970873,
+          "f1-score": 0.3384615384615385,
+          "support": 103.0
+        },
+        "screen_display": {
+          "precision": 0.9264705882352942,
+          "recall": 0.7,
+          "f1-score": 0.7974683544303798,
+          "support": 90.0
+        },
+        "apple_id_account": {
+          "precision": 0.9767441860465116,
+          "recall": 0.6363636363636364,
+          "f1-score": 0.7706422018348624,
+          "support": 66.0
+        },
+        "connectivity_network": {
+          "precision": 0.9130434782608695,
+          "recall": 0.42857142857142855,
+          "f1-score": 0.5833333333333334,
+          "support": 98.0
+        },
+        "app_store_issues": {
+          "precision": 0.8571428571428571,
+          "recall": 0.4,
+          "f1-score": 0.5454545454545454,
+          "support": 15.0
+        },
+        "billing_subscription": {
+          "precision": 0.8888888888888888,
+          "recall": 0.22857142857142856,
+          "f1-score": 0.36363636363636365,
+          "support": 35.0
+        },
+        "media_services": {
+          "precision": 0.8080808080808081,
+          "recall": 0.5,
+          "f1-score": 0.6177606177606177,
+          "support": 160.0
+        },
+        "store_hardware_service": {
+          "precision": 0.8571428571428571,
+          "recall": 0.14285714285714285,
+          "f1-score": 0.24489795918367346,
+          "support": 42.0
+        },
+        "other_general": {
+          "precision": 0.8279515640766902,
+          "recall": 0.9975683890577508,
+          "f1-score": 0.9048800661703887,
+          "support": 1645.0
+        },
+        "accuracy": 0.8488,
+        "macro avg": {
+          "precision": 0.8870280042689591,
+          "recall": 0.5109312876317275,
+          "f1-score": 0.6092299172405442,
+          "support": 2500.0
+        },
+        "weighted avg": {
+          "precision": 0.8553972648732304,
+          "recall": 0.8488,
+          "f1-score": 0.8243859786004838,
+          "support": 2500.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          212,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          33
+        ],
+        [
+          0,
+          22,
+          4,
+          0,
+          1,
+          1,
+          0,
+          4,
+          0,
+          71
+        ],
+        [
+          0,
+          1,
+          63,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          25
+        ],
+        [
+          0,
+          0,
+          0,
+          42,
+          3,
+          0,
+          0,
+          5,
+          0,
+          16
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          42,
+          0,
+          0,
+          5,
+          0,
+          51
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          6,
+          0,
+          0,
+          0,
+          9
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          4,
+          0,
+          23
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          80,
+          1,
+          78
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          6,
+          35
+        ],
+        [
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1641
+        ]
+      ],
+      "labels": [
+        "battery_power",
+        "os_update_bug",
+        "screen_display",
+        "apple_id_account",
+        "connectivity_network",
+        "app_store_issues",
+        "billing_subscription",
+        "media_services",
+        "store_hardware_service",
+        "other_general"
+      ]
+    },
+    "final_embedding_minilm": {
+      "accuracy": 0.8588,
+      "macro_f1": 0.6503,
+      "weighted_f1": 0.842,
+      "macro_precision": 0.7631,
+      "weighted_precision": 0.8455,
+      "macro_recall": 0.5996,
+      "weighted_recall": 0.8588,
+      "per_intent_report": {
+        "battery_power": {
+          "precision": 0.9380165289256198,
+          "recall": 0.9227642276422764,
+          "f1-score": 0.930327868852459,
+          "support": 246.0
+        },
+        "os_update_bug": {
+          "precision": 0.5151515151515151,
+          "recall": 0.1650485436893204,
+          "f1-score": 0.25,
+          "support": 103.0
+        },
+        "screen_display": {
+          "precision": 0.8461538461538461,
+          "recall": 0.6111111111111112,
+          "f1-score": 0.7096774193548387,
+          "support": 90.0
+        },
+        "apple_id_account": {
+          "precision": 0.8787878787878788,
+          "recall": 0.8787878787878788,
+          "f1-score": 0.8787878787878788,
+          "support": 66.0
+        },
+        "connectivity_network": {
+          "precision": 0.9054054054054054,
+          "recall": 0.6836734693877551,
+          "f1-score": 0.7790697674418605,
+          "support": 98.0
+        },
+        "app_store_issues": {
+          "precision": 0.5,
+          "recall": 0.4666666666666667,
+          "f1-score": 0.4827586206896552,
+          "support": 15.0
+        },
+        "billing_subscription": {
+          "precision": 0.7083333333333334,
+          "recall": 0.4857142857142857,
+          "f1-score": 0.576271186440678,
+          "support": 35.0
+        },
+        "media_services": {
+          "precision": 0.746268656716418,
+          "recall": 0.625,
+          "f1-score": 0.6802721088435374,
+          "support": 160.0
+        },
+        "store_hardware_service": {
+          "precision": 0.7272727272727273,
+          "recall": 0.19047619047619047,
+          "f1-score": 0.3018867924528302,
+          "support": 42.0
+        },
+        "other_general": {
+          "precision": 0.8660860097985846,
+          "recall": 0.9671732522796352,
+          "f1-score": 0.9138426191843768,
+          "support": 1645.0
+        },
+        "accuracy": 0.8588,
+        "macro avg": {
+          "precision": 0.7631475901545328,
+          "recall": 0.599641562575512,
+          "f1-score": 0.6502894262048114,
+          "support": 2500.0
+        },
+        "weighted avg": {
+          "precision": 0.8454591361861218,
+          "recall": 0.8588,
+          "f1-score": 0.8420140891123985,
+          "support": 2500.0
+        }
+      },
+      "confusion_matrix": [
+        [
+          227,
+          0,
+          1,
+          0,
+          0,
+          0,
+          3,
+          1,
+          0,
+          14
+        ],
+        [
+          2,
+          17,
+          5,
+          1,
+          1,
+          1,
+          0,
+          5,
+          0,
+          71
+        ],
+        [
+          1,
+          1,
+          55,
+          0,
+          0,
+          1,
+          0,
+          4,
+          0,
+          28
+        ],
+        [
+          0,
+          0,
+          0,
+          58,
+          1,
+          0,
+          1,
+          2,
+          0,
+          4
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          67,
+          0,
+          0,
+          3,
+          0,
+          27
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          7,
+          0,
+          1,
+          0,
+          7
+        ],
+        [
+          5,
+          0,
+          0,
+          0,
+          0,
+          3,
+          17,
+          0,
+          0,
+          10
+        ],
+        [
+          0,
+          3,
+          0,
+          2,
+          0,
+          0,
+          0,
+          100,
+          2,
+          53
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          8,
+          32
+        ],
+        [
+          7,
+          10,
+          4,
+          5,
+          5,
+          2,
+          2,
+          18,
+          1,
+          1591
+        ]
+      ],
+      "labels": [
+        "battery_power",
+        "os_update_bug",
+        "screen_display",
+        "apple_id_account",
+        "connectivity_network",
+        "app_store_issues",
+        "billing_subscription",
+        "media_services",
+        "store_hardware_service",
+        "other_general"
+      ]
+    }
+  },
+  "retrieval_performance": {
+    "recall@1": 0.0,
+    "recall@3": 0.0,
+    "recall@5": 0.0,
+    "mean_top1_similarity": 0.7167,
+    "evaluated_queries": 500
+  },
+  "escalation_policy": {
+    "total_evaluated": 300,
+    "auto_handle_count": 285,
+    "escalate_to_human_count": 15,
+    "auto_handle_rate": 0.95,
+    "escalation_rate": 0.05,
+    "sample_escalation_reasons": [
+      "High intent confidence (0.624) and strong historical match (0.760) for routine self-service resolution.",
+      "High intent confidence (0.966) and strong historical match (0.948) for routine self-service resolution.",
+      "High intent confidence (0.636) and strong historical match (0.835) for routine self-service resolution.",
+      "High intent confidence (0.919) and strong historical match (0.597) for routine self-service resolution.",
+      "High intent confidence (0.939) and strong historical match (0.738) for routine self-service resolution."
+    ]
+  },
+  "llm_judge_sample_evaluation": {
+    "evaluated_samples": 50,
+    "judge_mode": "HEURISTIC_ESTIMATE (PENDING API CREDENTIAL FOR LLM JUDGE)",
+    "average_overall_score": 4.392,
+    "average_groundedness": 5.0,
+    "unsupported_claim_rate": 0.0
+  },
+  "llm_judge_vs_human_agreement": {
+    "status": "PENDING HUMAN INPUT",
+    "sample_size": 0,
+    "spearman_correlation": null,
+    "pearson_correlation": null,
+    "exact_agreement_rate": null,
+    "adjacent_agreement_rate": null
+  }
+}

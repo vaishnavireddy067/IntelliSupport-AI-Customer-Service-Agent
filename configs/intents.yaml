@@ -1,0 +1,174 @@
+# Empirical Intent Taxonomy for AppleSupport
+# Derived from n-gram and TF-IDF topic discovery across customer inquiries in Kaggle twcs.csv.
+
+version: "1.0"
+brand: "AppleSupport"
+total_intents: 10
+
+intents:
+  - intent_id: "battery_power"
+    intent_name: "Battery & Power Management"
+    description: "Inquiries regarding battery drain, rapid percentage drops, device overheating, charging failures, or unexpected device shutdowns."
+    positive_examples:
+      - "My iPhone 7 battery is draining from 100% to 20% in two hours."
+      - "Phone won't charge past 80% when plugged into the original Apple charger."
+      - "My phone keeps shutting off randomly at 30% battery remaining."
+      - "Battery health dropped drastically overnight after the update."
+    confusing_intents:
+      - nearby_intent: "os_update_bug"
+        distinction: "If the customer mentions battery drain along with a recent iOS update, classify as battery_power if battery is the primary symptom being addressed; classify as os_update_bug if the complaint is primarily about update stability."
+      - nearby_intent: "store_hardware_service"
+        distinction: "If the customer asks directly to book a repair or battery replacement at Genius Bar, route to store_hardware_service."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Physical battery swelling or severe thermal event reported (safety hazard)."
+        - "Repeated failure of standard battery calibration troubleshooting."
+
+  - intent_id: "os_update_bug"
+    intent_name: "Operating System & Update Glitches"
+    description: "Bugs, UI freezes, keyboard autocorrect glitches, or severe performance lag triggered immediately following an iOS, macOS, or watchOS update."
+    positive_examples:
+      - "Ever since updating to iOS 11.1 my phone has been lagging terribly."
+      - "Updated to High Sierra and now my MacBook freezes on the boot logo."
+      - "The new iOS update broke my keyboard autocorrect with a weird question mark symbol."
+      - "Cannot complete software update, keeps saying verification failed."
+    confusing_intents:
+      - nearby_intent: "app_store_issues"
+        distinction: "Distinguish between a system-wide OS freeze (os_update_bug) versus an individual third-party app crashing (app_store_issues)."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Device is completely bricked (stuck in DFU/recovery loop with data loss risk)."
+        - "Customer is blocked on critical work due to OS regression."
+
+  - intent_id: "screen_display"
+    intent_name: "Screen, Display & Touch"
+    description: "Display rendering defects, unresponsive touchscreens, blank/black screens, vertical OLED lines, ghost touches, or cracked glass."
+    positive_examples:
+      - "My iPhone screen is completely black but it still vibrates when calls arrive."
+      - "Touch screen is unresponsive on the top half of the display."
+      - "There are vertical green lines running down my iPhone X screen."
+      - "Ghost touches occurring on display without any physical input."
+    confusing_intents:
+      - nearby_intent: "store_hardware_service"
+        distinction: "If the customer is asking how much a screen repair costs or how to book a visit, classify as store_hardware_service."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Hardware glass shatter or potential injury hazard."
+        - "Touch screen completely unresponsive preventing device unlock/backup."
+
+  - intent_id: "apple_id_account"
+    intent_name: "Apple ID, iCloud & Account Security"
+    description: "Account access lockouts, forgotten Apple ID passwords, two-factor authentication (2FA) recovery, and Activation Lock issues."
+    positive_examples:
+      - "My Apple ID has been locked for security reasons and I can't unlock it."
+      - "Forgot my iCloud password and the recovery phone number is no longer active."
+      - "Not receiving the two-factor authentication SMS verification code on my trusted device."
+      - "Unable to sign out of iCloud because of an account verification loop."
+    confusing_intents:
+      - nearby_intent: "billing_subscription"
+        distinction: "Payment method disputes tied to Apple ID belong under billing_subscription; credential and authentication issues belong here."
+    escalation_considerations:
+      default_action: "ESCALATE"
+      escalate_if:
+        - "Account takeover, stolen device, or unauthorized credentials modification."
+        - "Account recovery waiting period dispute requiring identity verification."
+
+  - intent_id: "connectivity_network"
+    intent_name: "Network & Connectivity (Wi-Fi, Cellular, Bluetooth)"
+    description: "Cellular reception loss ('No Service'), Wi-Fi drops, Bluetooth pairing failures (AirPods, car audio), or AirDrop issues."
+    positive_examples:
+      - "My iPhone keeps disconnecting from home Wi-Fi every few minutes."
+      - "Bluetooth won't detect my car stereo or AirPods."
+      - "Phone says No Service or Searching after toggling airplane mode."
+      - "Cannot make or receive cellular calls on my carrier network."
+    confusing_intents:
+      - nearby_intent: "media_services"
+        distinction: "Audio pausing due to network loss is connectivity_network; audio stuttering from Apple Music app glitches is media_services."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Suspected carrier SIM provisioning or hardware baseband antenna failure."
+
+  - intent_id: "app_store_issues"
+    intent_name: "App Store & Application Behavior"
+    description: "Third-party or native app crashes, App Store download/update loops ('Waiting...'), or app permission errors."
+    positive_examples:
+      - "Instagram and Twitter keep crashing immediately upon opening."
+      - "App Store says waiting on all pending app downloads."
+      - "Unable to download apps, keeps prompting for Apple ID password repeatedly."
+      - "WhatsApp won't open after the latest app update."
+    confusing_intents:
+      - nearby_intent: "billing_subscription"
+        distinction: "Inability to download due to an unpaid balance belongs under billing_subscription."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "App Store account suspension or repeated unresolvable download queue corruption."
+
+  - intent_id: "billing_subscription"
+    intent_name: "Billing, Subscriptions & Refunds"
+    description: "Unexpected charges, recurring subscription cancellations (Apple Music, iCloud), unauthorized charges, or refund requests."
+    positive_examples:
+      - "I was charged $9.99 for a subscription I cancelled last week."
+      - "How do I request a refund for an accidental in-app purchase my child made?"
+      - "Apple charged my credit card twice for my monthly iCloud storage upgrade."
+      - "Want to cancel my Apple Music renewal before it charges tonight."
+    confusing_intents:
+      - nearby_intent: "apple_id_account"
+        distinction: "Account access questions belong under apple_id_account; purchase or card debits belong under billing_subscription."
+    escalation_considerations:
+      default_action: "ESCALATE"
+      escalate_if:
+        - "Disputed transaction exceeding standard self-service refund window."
+        - "Allegations of unauthorized card fraud or minor unapproved purchases."
+
+  - intent_id: "media_services"
+    intent_name: "Media, Audio, Camera & iCloud Media"
+    description: "Issues involving Apple Music playlists, iTunes library synchronization, camera black screens, microphone quality, or Photos syncing."
+    positive_examples:
+      - "My Apple Music playlists disappeared from my library."
+      - "Songs won't download for offline listening in Apple Music."
+      - "Camera app is just showing a black screen when I switch to rear camera."
+      - "Microphone sounds muffled during voice memos and phone calls."
+    confusing_intents:
+      - nearby_intent: "connectivity_network"
+        distinction: "Bluetooth audio connection drop is connectivity_network; local music app playback error is media_services."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Loss of purchased iTunes media or non-reproducible iCloud library deletion."
+
+  - intent_id: "store_hardware_service"
+    intent_name: "Store, Repair Service & AppleCare"
+    description: "Scheduling Genius Bar appointments, repair cost estimates, trade-in inquiries, AppleCare+ warranty coverage, or hardware order tracking."
+    positive_examples:
+      - "How do I book an appointment at the Genius Bar to replace my screen?"
+      - "Can I trade in my iPhone 6s at the local Apple Store?"
+      - "When will my pre-ordered iPhone X be delivered?"
+      - "Is my iPad still covered under AppleCare+ for accidental damage?"
+    confusing_intents:
+      - nearby_intent: "screen_display"
+        distinction: "Troubleshooting a display problem is screen_display; asking to book a physical repair is store_hardware_service."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Urgent repair booking failure or order lost in transit."
+
+  - intent_id: "other_general"
+    intent_name: "General Inquiries & Feedback"
+    description: "Conversational greetings, brand feedback, complaints without technical symptoms, or queries outside typical technical support."
+    positive_examples:
+      - "Thank you AppleSupport for the quick help earlier today!"
+      - "Why is customer service so difficult to reach?"
+      - "Hello, is someone there to answer a question?"
+      - "Does Apple have any jobs available in Seattle?"
+    confusing_intents:
+      - nearby_intent: "all"
+        distinction: "Any message presenting a concrete technical symptom must be categorized into the specific technical intent, not other_general."
+    escalation_considerations:
+      default_action: "AUTO_HANDLE"
+      escalate_if:
+        - "Severe brand reputation threat, legal threats, or executive escalation requests."

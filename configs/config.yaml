@@ -1,0 +1,47 @@
+# Hiver AI Support Agent Configuration
+
+brand:
+  name: "AppleSupport"
+  handle: "@AppleSupport"
+  description: "Official Apple Support customer care on Twitter"
+
+data:
+  raw_archive_path: "C:\\Users\\anugu vaishnavi\\Downloads\\archive.zip"
+  fallback_raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  golden_dir: "data/golden"
+  
+  # Reproducible sampling parameters
+  data_sample_size: 500000       # Raw rows scanned during brand analysis / sampling
+  brand_sample_size: 25000       # Total conversation pairs extracted for target brand
+  train_split: 0.70              # 17,500 pairs
+  val_split: 0.15                # 3,750 pairs
+  test_split: 0.15               # 3,750 pairs
+  eval_size: 200                 # Golden evaluation sample size
+  random_seed: 42
+
+retrieval:
+  model_name: "all-MiniLM-L6-v2"
+  index_path: "data/processed/retrieval_index"
+  max_index_records: 15000
+  top_k: 3
+  similarity_metric: "cosine"
+  similarity_threshold: 0.65
+
+intent:
+  taxonomy_path: "configs/intents.yaml"
+  confidence_threshold: 0.75
+  classifier_model_path: "data/processed/embedding_classifier.pkl"
+  tfidf_model_path: "data/processed/tfidf_classifier.pkl"
+
+escalation:
+  intent_confidence_threshold: 0.75
+  retrieval_similarity_threshold: 0.65
+  enable_security_keyword_rules: true
+  enable_frustration_rules: true
+
+generation:
+  provider: "mock"               # "mock" for deterministic offline, "openai" or "openrouter" for LLM
+  model: "gpt-4o-mini"
+  temperature: 0.2
+  max_tokens: 150

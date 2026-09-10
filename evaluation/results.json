@@ -1,0 +1,26 @@
+[
+  {
+    "System": "Majority baseline",
+    "Intent Accuracy": 0.67,
+    "Macro F1": 0.0802,
+    "Retrieval R@5": 0.0,
+    "Reply Score": 3.0,
+    "Escalation F1": 0.0
+  },
+  {
+    "System": "TF-IDF baseline",
+    "Intent Accuracy": 0.86,
+    "Macro F1": 0.6687,
+    "Retrieval R@5": 0.452,
+    "Reply Score": 3.8,
+    "Escalation F1": 0.621
+  },
+  {
+    "System": "Proposed Agent",
+    "Intent Accuracy": 0.854,
+    "Macro F1": 0.6241,
+    "Retrieval R@5": 0.684,
+    "Reply Score": 4.38,
+    "Escalation F1": 0.8142
+  }
+]
