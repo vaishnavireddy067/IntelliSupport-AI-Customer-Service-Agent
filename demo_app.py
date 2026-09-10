@@ -199,9 +199,12 @@ def load_agent():
 @st.cache_data
 def load_golden_set():
     """Load the 200 curated golden examples."""
-    path = os.path.join(os.path.dirname(__file__), "data", "golden_eval.csv")
-    if os.path.exists(path):
-        return pd.read_csv(path)
+    path_set = os.path.join(os.path.dirname(__file__), "data", "golden", "golden_set.csv")
+    if os.path.exists(path_set):
+        return pd.read_csv(path_set)
+    path_eval = os.path.join(os.path.dirname(__file__), "data", "golden_eval.csv")
+    if os.path.exists(path_eval):
+        return pd.read_csv(path_eval)
     return None
 
 
@@ -479,37 +482,34 @@ def main():
 
         golden_df = load_golden_set()
         if golden_df is not None:
-            c1, c2 = st.columns(2)
-            with c1:
-                selected_diff = st.multiselect(
-                    "Filter by Difficulty Tier:",
-                    options=sorted(golden_df["difficulty"].dropna().unique().tolist()),
-                    default=golden_df["difficulty"].dropna().unique().tolist(),
-                )
-            with c2:
-                selected_intent = st.multiselect(
-                    "Filter by Intent:",
-                    options=sorted(golden_df["true_intent"].dropna().unique().tolist()),
-                    default=golden_df["true_intent"].dropna().unique().tolist()[:4],
-                )
+            intent_col = "gold_intent" if "gold_intent" in golden_df.columns else "true_intent"
+            diff_col = "difficulty" if "difficulty" in golden_df.columns else None
 
-            filtered_df = golden_df[
-                (golden_df["difficulty"].isin(selected_diff))
-                & (golden_df["true_intent"].isin(selected_intent))
-            ]
+            c1, c2 = st.columns(2)
+            filtered_df = golden_df
+            if diff_col:
+                with c1:
+                    selected_diff = st.multiselect(
+                        "Filter by Difficulty Tier:",
+                        options=sorted(golden_df[diff_col].dropna().unique().tolist()),
+                        default=golden_df[diff_col].dropna().unique().tolist(),
+                    )
+                filtered_df = filtered_df[filtered_df[diff_col].isin(selected_diff)]
+
+            if intent_col in golden_df.columns:
+                with c2:
+                    all_intents = sorted(golden_df[intent_col].dropna().unique().tolist())
+                    selected_intent = st.multiselect(
+                        "Filter by Intent:",
+                        options=all_intents,
+                        default=all_intents[:4] if len(all_intents) >= 4 else all_intents,
+                    )
+                filtered_df = filtered_df[filtered_df[intent_col].isin(selected_intent)]
 
             st.write(f"Showing **{len(filtered_df)}** of {len(golden_df)} golden evaluation cases:")
-            display_cols = [
-                "example_id",
-                "customer_query",
-                "true_intent",
-                "difficulty",
-                "ground_truth_resolution",
-                "should_escalate",
-            ]
-            st.dataframe(filtered_df[display_cols], use_container_width=True, height=350)
+            st.dataframe(filtered_df, use_container_width=True, height=350)
         else:
-            st.warning("Golden set file `data/golden_eval.csv` not found.")
+            st.warning("Golden set file `data/golden/golden_set.csv` not found.")
 
     # -------------------------------------------------------------
     # TAB 4: HUMAN VS. LLM JUDGE AGREEMENT AUDIT
@@ -525,10 +525,16 @@ def main():
 
         ja_df = load_judge_agreement()
         if ja_df is not None:
+            diff_series = (
+                ja_df["score_difference"]
+                if "score_difference" in ja_df.columns
+                else (ja_df["llm_judge_score"] - ja_df["human_overall_score_1_to_5"])
+            )
+            exact = (diff_series == 0).mean() * 100
+            adjacent = (diff_series.abs() <= 1).mean() * 100
+            mae = diff_series.abs().mean()
+
             j1, j2, j3, j4 = st.columns(4)
-            exact = (ja_df["score_diff"] == 0).mean() * 100
-            adjacent = (ja_df["adjacent_agreement"].astype(int)).mean() * 100
-            mae = ja_df["score_diff"].abs().mean()
             with j1:
                 st.metric("Adjacent Agreement (±1)", f"{adjacent:.1f}%")
             with j2:
@@ -540,16 +546,21 @@ def main():
 
             st.divider()
             st.write("##### Sample Comparison Breakdown")
-            show_cols = [
-                "example_id",
-                "customer_query",
-                "true_intent",
-                "human_score",
-                "judge_score",
-                "score_diff",
-                "disagreement_rationale",
+            display_cols = [
+                c
+                for c in [
+                    "sample_id",
+                    "customer_text",
+                    "draft_reply",
+                    "human_overall_score_1_to_5",
+                    "llm_judge_score",
+                    "score_difference",
+                    "human_groundedness_1_to_5",
+                    "human_relevance_1_to_5",
+                ]
+                if c in ja_df.columns
             ]
-            st.dataframe(ja_df[show_cols], use_container_width=True, height=300)
+            st.dataframe(ja_df[display_cols], use_container_width=True, height=320)
         else:
             st.warning("Judge agreement data not found in `evaluation/judge_agreement.csv`.")
 
