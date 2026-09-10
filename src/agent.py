@@ -10,6 +10,10 @@ Orchestrates:
 
 import os
 import sys
+
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
 import json
 import logging
 from typing import Dict, Any, Optional
@@ -70,20 +74,44 @@ class AppleSupportAgent:
             logger.warning("No retrieval index found at %s.", index_dir)
             retriever = None
 
+        if classifier is not None and retriever is not None:
+            if hasattr(retriever.index, "encoder") and hasattr(classifier, "_encoder"):
+                classifier._encoder = retriever.index.encoder
+
         return cls(classifier=classifier, retriever=retriever)
 
     def process_message(self, raw_message: str) -> Dict[str, Any]:
         """Execute the end-to-end support pipeline on a customer query."""
+        import time
+        import numpy as np
+
+        t0 = time.perf_counter()
+
         # 1. Preprocess query
         cleaned_text = clean_customer_text(raw_message)
         if not cleaned_text:
             cleaned_text = raw_message.strip()
 
         # 2. Intent classification & confidence
+        top_intents = []
         if self.classifier is not None:
             intent, confidence = self.classifier.predict_intent_with_confidence(cleaned_text)
+            if hasattr(self.classifier, "predict_proba"):
+                try:
+                    probs = self.classifier.predict_proba([cleaned_text])[0]
+                    classes = self.classifier.classes_
+                    sorted_indices = np.argsort(probs)[::-1]
+                    top_intents = [
+                        {"intent": str(classes[i]), "confidence": round(float(probs[i]), 4)}
+                        for i in sorted_indices[:3]
+                    ]
+                except Exception:
+                    top_intents = [{"intent": intent, "confidence": round(float(confidence), 4)}]
+            else:
+                top_intents = [{"intent": intent, "confidence": round(float(confidence), 4)}]
         else:
             intent, confidence = "other_general", 0.35
+            top_intents = [{"intent": intent, "confidence": 0.35}]
 
         # 3. Historical retrieval (Top-3)
         retrieved_examples = []
@@ -106,6 +134,8 @@ class AppleSupportAgent:
             retrieved_examples=retrieved_examples,
         )
 
+        latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+
         # Format evidence strictly matching prompt specification
         evidence_list = []
         for ex in retrieved_examples:
@@ -122,10 +152,12 @@ class AppleSupportAgent:
         return {
             "intent": intent,
             "confidence": round(float(confidence), 4),
+            "top_intents": top_intents,
             "draft_reply": draft_reply,
             "decision": decision_str,
             "escalation_reason": reason_str,
             "evidence": evidence_list,
+            "latency_ms": latency_ms,
             # Additional debug context
             "message": raw_message,
             "cleaned_message": cleaned_text,
