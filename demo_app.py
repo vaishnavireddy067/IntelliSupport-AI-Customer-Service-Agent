@@ -1,12 +1,11 @@
 """IntelliSupport AI - Autonomous Customer Support Agent Demo Application.
 
 Interactive, product-grade customer support experience featuring:
-1. Live Agent Playground: Manual entry + 6 authentic presets + 200 Golden Set loader
-2. Multi-Signal Diagnostics: Top-3 intent probability distribution, latency timer, safety scan
-3. Empirical Benchmarks: Trivial Majority vs. Simple TF-IDF vs. IntelliSupport AI
-4. Golden Eval Explorer: 200 curated scenarios with difficulty filters
-5. Human vs. LLM Judge Audit: 50 audited response pairs with 100% adjacent agreement
-6. Architecture, Top 5 Failure Modes, Misleading Headline Analysis & 1-Week Roadmap
+1. Live Agent Playground: Customer Message -> AI Analysis -> Suggested Response -> Evidence -> Decision
+2. Empirical Benchmarks: Trivial Majority vs. Simple TF-IDF vs. IntelliSupport AI
+3. Golden Eval Explorer: 200-case hand-labelled benchmark with dynamic filters, search, pagination, and distributions
+4. Human vs. LLM Judge Audit: 50 audited response pairs with 100% adjacent agreement
+5. Architecture & Decisions Log: 15 non-obvious engineering decisions, top 5 failure modes, and 1-week roadmap
 """
 
 import os
@@ -68,7 +67,7 @@ CUSTOM_CSS = """
         max-width: 1200px;
     }
 
-    /* Hero Header */
+    /* Hero Header - Dark Navy */
     .hero-header {
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         padding: 24px 28px;
@@ -151,6 +150,29 @@ CUSTOM_CSS = """
         gap: 8px;
     }
 
+    /* Summary Card */
+    .summary-card {
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 14px 18px;
+        text-align: center;
+        height: 100%;
+    }
+    .summary-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: #f8fafc;
+        margin-bottom: 2px;
+    }
+    .summary-lbl {
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
     /* Analysis Triad Cards */
     .triad-card {
         background: #0f172a;
@@ -189,7 +211,7 @@ CUSTOM_CSS = """
         border-radius: 8px;
         padding: 4px 12px;
         font-weight: 800;
-        font-size: 15px;
+        font-size: 14px;
         letter-spacing: 0.03em;
     }
     .badge-escalate-pill {
@@ -200,8 +222,30 @@ CUSTOM_CSS = """
         border-radius: 8px;
         padding: 4px 12px;
         font-weight: 800;
-        font-size: 15px;
+        font-size: 14px;
         letter-spacing: 0.03em;
+    }
+
+    /* Decision Banner */
+    .decision-banner-auto {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(21, 128, 61, 0.25) 100%);
+        border: 1.5px solid #22c55e;
+        border-radius: 10px;
+        padding: 14px 20px;
+        margin: 16px 0;
+        color: #bbf7d0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .decision-banner-escalate {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.25) 100%);
+        border: 1.5px solid #ef4444;
+        border-radius: 10px;
+        padding: 14px 20px;
+        margin: 16px 0;
+        color: #fecaca;
+        font-size: 14px;
+        line-height: 1.5;
     }
 
     /* HERO Suggested Response */
@@ -235,51 +279,52 @@ CUSTOM_CSS = """
         border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    /* Evidence Card */
-    .evidence-summary-card {
+    /* Case Cards for Golden Explorer */
+    .case-card {
         background: #0f172a;
         border: 1px solid #334155;
         border-radius: 10px;
         padding: 16px 20px;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
+        transition: border-color 0.2s ease;
     }
-    .match-tag {
-        background: rgba(59, 130, 246, 0.2);
+    .case-card:hover {
+        border-color: #3b82f6;
+    }
+    .case-id-badge {
+        font-size: 12px;
+        font-weight: 700;
         color: #93c5fd;
-        border: 1px solid rgba(59, 130, 246, 0.4);
+        background: rgba(59, 130, 246, 0.15);
         padding: 3px 8px;
         border-radius: 6px;
-        font-weight: 700;
-        font-size: 12px;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .case-diff-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .diff-easy {
+        background: rgba(34, 197, 94, 0.15);
+        color: #86efac;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .diff-medium {
+        background: rgba(168, 85, 247, 0.15);
+        color: #d8b4fe;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .diff-hard {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fde047;
+        border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
-    /* Decision Explanation Card */
-    .explanation-container {
-        background: #0f172a;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 18px 22px;
-        margin-top: 18px;
-    }
-    .gate-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        font-size: 14px;
-        color: #cbd5e1;
-        margin-bottom: 8px;
-        line-height: 1.5;
-    }
-    .gate-icon-pass {
-        color: #4ade80;
-        font-weight: 800;
-    }
-    .gate-icon-flag {
-        color: #f87171;
-        font-weight: 800;
-    }
-
-    /* Diagnostics Bar */
+    /* Diagnostics Pill */
     .diag-pill {
         display: inline-flex;
         align-items: center;
@@ -309,14 +354,44 @@ def load_agent():
 
 @st.cache_data
 def load_golden_set():
-    """Load the 200 curated golden examples."""
-    path_set = os.path.join(os.path.dirname(__file__), "data", "golden", "golden_set.csv")
-    if os.path.exists(path_set):
-        return pd.read_csv(path_set)
+    """Load the 200 curated golden examples with standardized columns."""
     path_eval = os.path.join(os.path.dirname(__file__), "data", "golden_eval.csv")
     if os.path.exists(path_eval):
-        return pd.read_csv(path_eval)
-    return None
+        df = pd.read_csv(path_eval)
+    else:
+        path_set = os.path.join(os.path.dirname(__file__), "data", "golden", "golden_set.csv")
+        if os.path.exists(path_set):
+            df = pd.read_csv(path_set)
+        else:
+            return None
+
+    # Standardize column mappings across schema variants
+    if "example_id" not in df.columns and "id" in df.columns:
+        df["example_id"] = df["id"]
+    if "customer_message" not in df.columns and "text" in df.columns:
+        df["customer_message"] = df["text"]
+    if "gold_action" not in df.columns and "gold_escalation" in df.columns:
+        df["gold_action"] = df["gold_escalation"]
+    if "gold_reason" not in df.columns and "notes" in df.columns:
+        df["gold_reason"] = df["notes"]
+    if "conversation_id" not in df.columns and "customer_tweet_id" in df.columns:
+        df["conversation_id"] = df["customer_tweet_id"]
+    if "brand" not in df.columns:
+        df["brand"] = "AppleSupport"
+
+    # Derive difficulty if not present as standalone column
+    if "difficulty" not in df.columns and "context" in df.columns:
+        df["difficulty"] = df["context"].apply(
+            lambda x: x.split("Difficulty: ")[1].strip() if "Difficulty: " in str(x) else "Standard"
+        )
+
+    # Clean whitespace and types
+    df["difficulty"] = df["difficulty"].astype(str).str.strip()
+    df["gold_intent"] = df["gold_intent"].astype(str).str.strip()
+    df["gold_action"] = df["gold_action"].astype(str).str.strip()
+    df["customer_message"] = df["customer_message"].astype(str).str.strip()
+
+    return df
 
 
 @st.cache_data
@@ -363,7 +438,7 @@ def main():
     )
 
     # -------------------------------------------------------------
-    # TAB 1: LIVE AGENT PLAYGROUND (Centerpiece Experience)
+    # TAB 1: LIVE AGENT PLAYGROUND
     # -------------------------------------------------------------
     with tab_play:
         # Authentic scenarios mapping
@@ -376,11 +451,11 @@ def main():
             "📶 WiFi Greyed Out": "@AppleSupport my iPhone 7 has WiFi and Bluetooth completely greyed out in settings and won't connect",
         }
 
-        # Initialize session state for manual query entry
+        # Initialize session state for query
         if "active_query" not in st.session_state:
             st.session_state["active_query"] = "@AppleSupport how do I book an appointment at the Genius Bar to fix my cracked screen?"
 
-        # Step 1: Customer Message Card with Input Modes
+        # Step 1: Customer Message
         st.markdown(
             """
             <div class="section-card">
@@ -391,7 +466,7 @@ def main():
         )
 
         input_mode = st.radio(
-            "Select Input Mode:",
+            "Input Mode:",
             ["✍️ Manual Custom Entry", "⚡ Authentic Presets", "🎯 Golden Benchmark Sample"],
             horizontal=True,
             label_visibility="collapsed",
@@ -399,26 +474,24 @@ def main():
 
         if input_mode == "⚡ Authentic Presets":
             selected_preset = st.selectbox(
-                "Choose an authentic preset query:",
+                "Choose an authentic scenario:",
                 list(preset_scenarios.keys()),
                 index=0,
             )
             st.session_state["active_query"] = preset_scenarios[selected_preset]
 
         elif input_mode == "🎯 Golden Benchmark Sample":
-            golden_df = load_golden_set()
-            if golden_df is not None:
-                text_col = "text" if "text" in golden_df.columns else "customer_message"
-                intent_col = "gold_intent" if "gold_intent" in golden_df.columns else "true_intent"
+            golden_df_sample = load_golden_set()
+            if golden_df_sample is not None:
                 sample_options = [
-                    f"#{row.get('id', row.get('example_id', idx+1))} [{row.get(intent_col, 'intent')}]: {str(row[text_col])[:70]}..."
-                    for idx, row in golden_df.head(40).iterrows()
+                    f"Case #{row['example_id']:03d} [{row['gold_intent']}]: {row['customer_message'][:70]}..."
+                    for _, row in golden_df_sample.head(30).iterrows()
                 ]
-                selected_sample = st.selectbox("Pick from curated 200-sample Golden Set:", sample_options)
+                selected_sample = st.selectbox("Pick from curated Golden Set:", sample_options)
                 selected_idx = sample_options.index(selected_sample)
-                st.session_state["active_query"] = str(golden_df.iloc[selected_idx][text_col])
+                st.session_state["active_query"] = str(golden_df_sample.iloc[selected_idx]["customer_message"])
 
-        # Manual Text Area with clear button
+        # Customer Message Input Area
         col_text, col_actions = st.columns([5, 1])
         with col_text:
             user_input = st.text_area(
@@ -439,11 +512,23 @@ def main():
 
         col_btn, col_info = st.columns([2, 5])
         with col_btn:
-            run_btn = st.button("🚀 Analyze customer message", type="primary", use_container_width=True)
+            run_btn = st.button("🚀 Analyze with IntelliSupport AI", type="primary", use_container_width=True)
         with col_info:
             char_count = len(user_input)
             word_count = len(user_input.split())
             st.caption(f"⚡ {word_count} words | {char_count} characters | Calibrated sentence-transformers inference")
+
+        # Hidden technical details expander
+        with st.expander("⚙️ Model & System Details", expanded=False):
+            st.markdown(
+                """
+                - **Intent Classifier:** `sentence-transformers/all-MiniLM-L6-v2` + Calibrated Logistic Regression
+                - **Vector Store:** 15,000 dense vectors (Cosine Similarity)
+                - **Retrieval Scope:** Top-3 verified historical resolution precedents
+                - **Decision Thresholds:** Intent Confidence >= 0.40, Precedent Similarity >= 0.55
+                - **Escalation Triggers:** Security keywords, customer frustration, financial disputes, account lockouts
+                """
+            )
 
         # Execute analysis
         if user_input.strip():
@@ -474,7 +559,7 @@ def main():
                 st.markdown(
                     f"""
                     <div class="triad-card">
-                        <div class="triad-label">🎯 Intent</div>
+                        <div class="triad-label">🎯 Predicted Intent</div>
                         <div class="triad-value" style="color: #60a5fa;">{intent_clean}</div>
                         <div style="font-size: 11px; color: #64748b; margin-top: 4px;"><code>{res['intent']}</code></div>
                     </div>
@@ -487,7 +572,7 @@ def main():
                 st.markdown(
                     f"""
                     <div class="triad-card">
-                        <div class="triad-label">✦ Confidence</div>
+                        <div class="triad-label">📊 Confidence</div>
                         <div class="triad-value" style="color: {conf_color};">{confidence_pct:.1f}%</div>
                         <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Calibrated Softmax</div>
                     </div>
@@ -498,7 +583,7 @@ def main():
             with col_dec:
                 if decision == "AUTO_HANDLE":
                     dec_html = '<span class="badge-auto-pill">AUTO-HANDLE</span>'
-                    dec_sub = "Safe for automated reply"
+                    dec_sub = "Routine request suitable for automated support"
                 else:
                     dec_html = '<span class="badge-escalate-pill">ESCALATE</span>'
                     dec_sub = "Human specialist required"
@@ -509,6 +594,28 @@ def main():
                         <div class="triad-label">🛡 Decision</div>
                         <div style="margin-top: 2px;">{dec_html}</div>
                         <div style="font-size: 11px; color: #64748b; margin-top: 6px;">{dec_sub}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+            # Decision Banner
+            if decision == "AUTO_HANDLE":
+                st.markdown(
+                    f"""
+                    <div class="decision-banner-auto">
+                        <b>✓ AUTO-HANDLE</b> — Routine request suitable for automated support.<br>
+                        <span style="font-size: 12px; opacity: 0.9;"><b>Stated Reason:</b> {res['escalation_reason']}</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    f"""
+                    <div class="decision-banner-escalate">
+                        <b>⚠ ESCALATE TO HUMAN</b> — Human specialist review required.<br>
+                        <span style="font-size: 12px; opacity: 0.9;"><b>Stated Reason:</b> {res['escalation_reason']}</span>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -529,10 +636,10 @@ def main():
             sec_scan = "FLAGGED ⚠️" if "security" in res["escalation_reason"].lower() or "risk" in res["escalation_reason"].lower() else "CLEAN ✅"
             st.markdown(
                 f"""
-                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px 0;">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px 0;">
                     <div class="diag-pill">⚡ Latency: <span class="diag-val">{latency_ms} ms</span></div>
                     <div class="diag-pill">🛡️ Security Scan: <span class="diag-val">{sec_scan}</span></div>
-                    <div class="diag-pill">🔍 Top Match: <span class="diag-val">{top_sim * 100:.1f}% similarity</span></div>
+                    <div class="diag-pill">🔍 Top Match: <span class="diag-val">{top_sim:.3f} similarity</span></div>
                     <div class="diag-pill">📚 Precedent Base: <span class="diag-val">15,000 vectors</span></div>
                 </div>
                 """,
@@ -544,7 +651,7 @@ def main():
                 f"""
                 <div class="hero-reply-box">
                     <div class="hero-reply-header">
-                        ✨ ③ Suggested Response (Hero Result)
+                        ✨ ③ Suggested Response
                     </div>
                     <div class="hero-reply-text">
                         {res['draft_reply']}
@@ -565,7 +672,7 @@ def main():
             st.markdown(
                 f"""
                 <div class="section-card">
-                    <div class="section-title">🔎 ④ Why this answer?</div>
+                    <div class="section-title">🔎 ④ Historical Evidence</div>
                     <div style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">
                         <b>{num_cases} similar historical cases found</b> from verified brand resolution archives
                     </div>
@@ -576,17 +683,17 @@ def main():
 
             if evidence:
                 top_ev = evidence[0]
-                sim_pct = int(round(top_ev["similarity"] * 100))
+                sim_score = top_ev["similarity"]
                 st.markdown(
                     f"""
-                    <div class="evidence-summary-card">
+                    <div class="case-card">
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                            <span class="match-tag">{sim_pct}% match (Precedent #{top_ev['conversation_id']})</span>
+                            <span class="case-id-badge">{sim_score:.3f} similarity (Precedent #{top_ev['conversation_id']})</span>
                             <span style="font-size: 11px; color: #64748b;">Dense Vector Cosine Similarity</span>
                         </div>
-                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;"><b>Customer asked historically:</b></div>
+                        <div style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;"><b>Customer asked historically:</b></div>
                         <div style="font-size: 13px; color: #cbd5e1; font-style: italic; margin-bottom: 10px;">"{top_ev['historical_query']}"</div>
-                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 4px;"><b>Verified AppleSupport resolution:</b></div>
+                        <div style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;"><b>Historical AppleSupport resolution:</b></div>
                         <div style="font-size: 14px; color: #f1f5f9; background: rgba(30, 41, 59, 0.6); padding: 10px 14px; border-radius: 6px;">
                             "{top_ev['historical_reply']}"
                         </div>
@@ -603,67 +710,6 @@ def main():
                         st.divider()
             else:
                 st.info("No historical resolution met the strict 0.55 similarity threshold.")
-
-            # Step 5: Decision Explanation - Addressing Hiver Interview Question!
-            dec_display = decision.replace("_", "-")
-            st.markdown(
-                f"""
-                <div class="explanation-container">
-                    <div style="font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                        🧠 ⑤ Why did the AI choose {dec_display}?
-                    </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-            if decision == "AUTO_HANDLE":
-                st.markdown(
-                    f"""
-                    <div class="gate-item">
-                        <span class="gate-icon-pass">✓</span>
-                        <div><b>Intent Confidence:</b> {confidence_pct:.1f}% exceeds safe operating threshold (40.0% calibrated threshold).</div>
-                    </div>
-                    <div class="gate-item">
-                        <span class="gate-icon-pass">✓</span>
-                        <div><b>Historical Match Available:</b> Precedent found with <b>{int(top_sim * 100)}% similarity</b> in verified Apple resolutions.</div>
-                    </div>
-                    <div class="gate-item">
-                        <span class="gate-icon-pass">✓</span>
-                        <div><b>No Security Concern Detected:</b> Passed regex safety scan (no password breach, theft, fraud, or legal action keywords).</div>
-                    </div>
-                    <div class="gate-item">
-                        <span class="gate-icon-pass">✓</span>
-                        <div><b>Routine Support Request:</b> Standard troubleshooting / appointment flow with established historical precedent.</div>
-                    </div>
-                    <div style="margin-top: 12px; padding: 10px 14px; background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; border-radius: 4px; font-size: 13px; color: #86efac;">
-                        <b>Policy Assessment:</b> {res['escalation_reason']}
-                    </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-            else:
-                st.markdown(
-                    f"""
-                    <div class="gate-item">
-                        <span class="gate-icon-flag">⚠️</span>
-                        <div><b>Escalation Policy Triggered:</b> {res['escalation_reason']}</div>
-                    </div>
-                    <div class="gate-item">
-                        <span class="gate-icon-pass">✓</span>
-                        <div><b>Safety Gate Activated:</b> Automated reply suppressed to prevent customer churn or unauthorized commitments.</div>
-                    </div>
-                    <div class="gate-item">
-                        <span class="gate-icon-pass">✓</span>
-                        <div><b>Human Dispatch:</b> Case packaged with retrieved context and routed to senior support queue.</div>
-                    </div>
-                    <div style="margin-top: 12px; padding: 10px 14px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 4px; font-size: 13px; color: #fca5a5;">
-                        <b>Policy Assessment:</b> {res['escalation_reason']}
-                    </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
 
     # -------------------------------------------------------------
     # TAB 2: BENCHMARKS & METRICS
@@ -735,55 +781,265 @@ def main():
         )
 
     # -------------------------------------------------------------
-    # TAB 3: GOLDEN SET EXPLORER
+    # TAB 3: GOLDEN EVAL EXPLORER (Redesigned & Bug-Free)
     # -------------------------------------------------------------
     with tab_golden:
-        st.subheader("🎯 Golden Evaluation Set Explorer (200 Stratified Scenarios)")
-        st.markdown(
-            "> **Verified Benchmark:** 200 authentic customer queries stratified across **5 difficulty tiers** with grounded ground-truth resolutions."
-        )
+        st.markdown("### 🎯 Golden Evaluation")
+        st.caption("Explore the benchmark used to measure intent classification, escalation decisions, and support quality.")
 
         golden_df = load_golden_set()
         if golden_df is not None:
-            intent_col = "gold_intent" if "gold_intent" in golden_df.columns else "true_intent"
-            diff_col = "difficulty" if "difficulty" in golden_df.columns else None
+            # 1. Real Summary Cards Calculated from Real Data
+            s1, s2, s3, s4 = st.columns(4)
+            with s1:
+                st.markdown(
+                    f"""
+                    <div class="summary-card">
+                        <div class="summary-val">{len(golden_df)}</div>
+                        <div class="summary-lbl">Golden Cases</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with s2:
+                st.markdown(
+                    f"""
+                    <div class="summary-card">
+                        <div class="summary-val">{golden_df['gold_intent'].nunique()}</div>
+                        <div class="summary-lbl">Intents Covered</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with s3:
+                st.markdown(
+                    f"""
+                    <div class="summary-card">
+                        <div class="summary-val">{golden_df['difficulty'].nunique()}</div>
+                        <div class="summary-lbl">Difficulty Tiers</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with s4:
+                esc_count = (golden_df["gold_action"] == "ESCALATE").sum()
+                st.markdown(
+                    f"""
+                    <div class="summary-card">
+                        <div class="summary-val" style="color: #fca5a5;">{esc_count}</div>
+                        <div class="summary-lbl">Escalate Cases</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-            # Summary Metric Cards
-            g1, g2, g3, g4 = st.columns(4)
-            with g1:
-                st.metric("Total Golden Cases", len(golden_df))
-            with g2:
-                st.metric("Difficulty Tiers", "5 Tiers")
-            with g3:
-                st.metric("Intents Represented", golden_df[intent_col].nunique() if intent_col in golden_df.columns else 10)
-            with g4:
-                st.metric("Escalation Cases", (golden_df["gold_escalation"] == "ESCALATE").sum() if "gold_escalation" in golden_df.columns else 56)
+            st.write("")
 
-            c1, c2 = st.columns(2)
-            filtered_df = golden_df
-            if diff_col:
-                with c1:
-                    selected_diff = st.multiselect(
-                        "Filter by Difficulty Tier:",
-                        options=sorted(golden_df[diff_col].dropna().unique().tolist()),
-                        default=golden_df[diff_col].dropna().unique().tolist(),
+            # 2. Filter Card
+            st.markdown(
+                """
+                <div class="section-card">
+                    <div class="section-title">🔎 Explore evaluation cases</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # Search Box
+            search_query = st.text_input(
+                "Search customer messages...",
+                placeholder="Search keywords like battery, wifi, screen, appointment, locked...",
+                key="golden_search_input",
+            )
+
+            # Filter Dropdowns derived dynamically from loaded dataframe
+            f_col1, f_col2, f_col3, f_col4 = st.columns([3, 3, 3, 2])
+
+            diff_options = ["All"] + sorted(golden_df["difficulty"].dropna().unique().tolist())
+            intent_options = ["All intents"] + sorted(golden_df["gold_intent"].dropna().unique().tolist())
+            action_options = ["All", "AUTO_HANDLE", "ESCALATE"]
+
+            with f_col1:
+                selected_diff = st.selectbox("Difficulty:", diff_options, index=0, key="golden_sel_diff")
+            with f_col2:
+                selected_intent = st.selectbox("Intent:", intent_options, index=0, key="golden_sel_intent")
+            with f_col3:
+                selected_action = st.selectbox("Escalation:", action_options, index=0, key="golden_sel_action")
+            with f_col4:
+                st.write("")
+                st.write("")
+                if st.button("🔄 Clear filters", use_container_width=True):
+                    st.session_state["golden_search_input"] = ""
+                    st.session_state["golden_sel_diff"] = "All"
+                    st.session_state["golden_sel_intent"] = "All intents"
+                    st.session_state["golden_sel_action"] = "All"
+                    st.rerun()
+
+            # Dynamic Filtering Logic - Default state always shows ALL 200 cases
+            filtered_df = golden_df.copy()
+
+            if search_query.strip():
+                clean_q = search_query.strip().lower()
+                filtered_df = filtered_df[
+                    filtered_df["customer_message"].astype(str).str.lower().str.contains(clean_q, regex=False)
+                ]
+
+            if selected_diff != "All":
+                filtered_df = filtered_df[filtered_df["difficulty"] == selected_diff]
+
+            if selected_intent != "All intents":
+                filtered_df = filtered_df[filtered_df["gold_intent"] == selected_intent]
+
+            if selected_action != "All":
+                filtered_df = filtered_df[filtered_df["gold_action"] == selected_action]
+
+            # Result Summary
+            pct_selected = (len(filtered_df) / len(golden_df)) * 100 if len(golden_df) > 0 else 0
+            st.markdown(
+                f"**Showing {len(filtered_df)} of {len(golden_df)} golden evaluation cases** "
+                f"<span style='color: #94a3b8;'>({pct_selected:.1f}% of benchmark selected)</span>",
+                unsafe_allow_html=True,
+            )
+
+            # Pagination Controls
+            p_col1, p_col2, p_col3 = st.columns([2, 4, 3])
+            page_size = p_col1.selectbox("Cases per page:", [10, 20, 50], index=1, key="golden_page_size")
+            total_pages = max(1, (len(filtered_df) + page_size - 1) // page_size)
+
+            if "golden_page" not in st.session_state:
+                st.session_state["golden_page"] = 1
+            if st.session_state["golden_page"] > total_pages:
+                st.session_state["golden_page"] = 1
+
+            current_page = st.session_state["golden_page"]
+            start_idx = (current_page - 1) * page_size
+            end_idx = min(len(filtered_df), start_idx + page_size)
+
+            with p_col2:
+                if len(filtered_df) > 0:
+                    st.write(f"Displaying cases **{start_idx + 1}–{end_idx}** of **{len(filtered_df)}** (Page {current_page} of {total_pages})")
+                else:
+                    st.write("No cases match the selected filter criteria.")
+
+            with p_col3:
+                btn_prev, btn_next = st.columns(2)
+                if btn_prev.button("◀ Previous", disabled=(current_page <= 1), use_container_width=True):
+                    st.session_state["golden_page"] = max(1, current_page - 1)
+                    st.rerun()
+                if btn_next.button("Next ▶", disabled=(current_page >= total_pages), use_container_width=True):
+                    st.session_state["golden_page"] = min(total_pages, current_page + 1)
+                    st.rerun()
+
+            st.write("")
+
+            # Render Case Cards for the current page
+            page_slice = filtered_df.iloc[start_idx:end_idx]
+            for _, row in page_slice.iterrows():
+                diff_val = str(row["difficulty"])
+                if "easy" in diff_val.lower():
+                    diff_class = "diff-easy"
+                elif "medium" in diff_val.lower():
+                    diff_class = "diff-medium"
+                else:
+                    diff_class = "diff-hard"
+
+                action_val = str(row["gold_action"])
+                action_badge = (
+                    '<span class="badge-auto-pill" style="font-size: 11px; padding: 2px 8px;">AUTO_HANDLE</span>'
+                    if action_val == "AUTO_HANDLE"
+                    else '<span class="badge-escalate-pill" style="font-size: 11px; padding: 2px 8px;">ESCALATE</span>'
+                )
+
+                col_card, col_action_btn = st.columns([6, 1])
+                with col_card:
+                    st.markdown(
+                        f"""
+                        <div class="case-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span class="case-id-badge">Case #{int(row['example_id']):03d}</span>
+                                <span class="case-diff-badge {diff_class}">{diff_val}</span>
+                            </div>
+                            <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">
+                                Customer message
+                            </div>
+                            <div style="font-size: 14px; color: #f8fafc; background: rgba(30, 41, 59, 0.6); padding: 10px 14px; border-radius: 6px; margin-bottom: 10px; line-height: 1.5;">
+                                "{row['customer_message']}"
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">🎯 Gold Intent</div>
+                                    <div style="font-size: 14px; color: #60a5fa; font-weight: 600;">{row['gold_intent']}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">🛡 Gold Decision</div>
+                                    <div style="margin-top: 2px;">{action_badge}</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">
+                                📝 Label Notes & Ground Truth Reason
+                            </div>
+                            <div style="font-size: 12px; color: #cbd5e1; background: rgba(15, 23, 42, 0.8); padding: 8px 12px; border-radius: 6px; margin-bottom: 8px;">
+                                {row['gold_reason']}
+                            </div>
+                            <div style="font-size: 11px; color: #64748b;">
+                                Conversation ID: <code>{row['conversation_id']}</code> | Target Brand: <b>{row['brand']}</b>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
                     )
-                filtered_df = filtered_df[filtered_df[diff_col].isin(selected_diff)]
+                with col_action_btn:
+                    st.write("")
+                    st.write("")
+                    if st.button("⚡ Test", key=f"btn_test_{row['example_id']}", use_container_width=True, help="Load into Playground"):
+                        st.session_state["active_query"] = str(row["customer_message"])
+                        st.info("Loaded into Playground! Switch to Tab 1 to run inference.")
 
-            if intent_col in golden_df.columns:
-                with c2:
-                    all_intents = sorted(golden_df[intent_col].dropna().unique().tolist())
-                    selected_intent = st.multiselect(
-                        "Filter by Intent:",
-                        options=all_intents,
-                        default=all_intents[:4] if len(all_intents) >= 4 else all_intents,
-                    )
-                filtered_df = filtered_df[filtered_df[intent_col].isin(selected_intent)]
+            st.divider()
 
-            st.write(f"Showing **{len(filtered_df)}** of {len(golden_df)} golden evaluation cases:")
-            st.dataframe(filtered_df, use_container_width=True, height=350)
+            # 3. Difficulty Distribution Section
+            st.markdown("#### 📊 Difficulty Distribution")
+            diff_counts = golden_df["difficulty"].value_counts()
+            for d_name, count in diff_counts.items():
+                d_c1, d_c2 = st.columns([3, 1])
+                d_c1.write(f"**{d_name}**")
+                d_c1.progress(count / len(golden_df))
+                d_c2.write(f"**{count}** cases ({count / len(golden_df) * 100:.1f}%)")
+
+            st.write("")
+
+            # 4. Intent Coverage Section
+            st.markdown("#### 🎯 Intent Coverage")
+            intent_counts = golden_df["gold_intent"].value_counts()
+            for i_name, count in intent_counts.items():
+                disp_name = INTENT_DISPLAY_NAMES.get(i_name, i_name)
+                i_c1, i_c2 = st.columns([3, 1])
+                i_c1.write(f"**{disp_name}** (`{i_name}`)")
+                i_c1.progress(count / len(golden_df))
+                i_c2.write(f"**{count}** cases ({count / len(golden_df) * 100:.1f}%)")
+
+            st.write("")
+
+            # 5. Labeling Methodology Documentation
+            with st.expander("📋 How the Golden Set Was Built", expanded=False):
+                st.markdown(
+                    """
+                    - **Total Curated Examples:** 200 authentic customer queries sampled from the held-out AppleSupport test split.
+                    - **Sampling Strategy:** Stratified selection ensuring 18–22 examples for each of the 10 empirical intents.
+                    - **5 Linguistic Difficulty Tiers:**
+                      1. *Easy (Standard Symptom):* Clean technical symptom reports (101 cases).
+                      2. *Medium (Noisy/Slang):* Informal contractions and Twitter slang (30 cases).
+                      3. *Hard (Compound/Multi-Intent):* Multiple symptoms reported in a single tweet (55 cases).
+                      4. *Hard (High Emotion/Frustration):* Distress or customer anger requiring empathetic routing (10 cases).
+                      5. *Hard (Short/Ambiguous):* Low-context queries under 30 characters (4 cases).
+                    - **Ground-Truth Labeling:**
+                      - *Intent:* Canonical assignment based on primary customer need.
+                      - *Decision:* Rule-based policy assigning `ESCALATE` for security lockouts, financial debits, and severe frustration.
+                    - **Leakage Prevention:** Split strictly by Twitter thread ID; zero overlap between training resolution corpus and golden evaluation set.
+                    """
+                )
         else:
-            st.warning("Golden set file `data/golden/golden_set.csv` not found.")
+            st.warning("Golden set file `data/golden_eval.csv` not found.")
 
     # -------------------------------------------------------------
     # TAB 4: HUMAN VS. LLM JUDGE AGREEMENT AUDIT
