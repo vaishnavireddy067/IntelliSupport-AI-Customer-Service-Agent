@@ -1132,6 +1132,10 @@ def main():
         if "customer_input_text" not in st.session_state:
             st.session_state["customer_input_text"] = "@AppleSupport how do I book an appointment at the Genius Bar to fix my cracked screen?"
 
+        def set_preset_scenario(text_val):
+            st.session_state["customer_input_text"] = text_val
+            st.session_state["auto_analyze"] = True
+
         col_left, col_right = st.columns([1, 1.35], gap="large")
 
         # ---------------- LEFT COLUMN: INPUT & QUICK SCENARIOS ----------------
@@ -1164,37 +1168,56 @@ def main():
                 unsafe_allow_html=True,
             )
 
-            # 2-column grid of 6 scenario buttons
+            # 2-column grid of 6 scenario buttons using callbacks
             sc_cols1, sc_cols2 = st.columns(2)
             with sc_cols1:
-                if st.button("🔋 Battery Drain", use_container_width=True):
-                    st.session_state["customer_input_text"] = preset_scenarios["Battery Drain"]
-                    st.rerun()
-                if st.button("🛡️ Security Issue", use_container_width=True):
-                    st.session_state["customer_input_text"] = preset_scenarios["Security Issue"]
-                    st.rerun()
-                if st.button("📱 App Store", use_container_width=True):
-                    st.session_state["customer_input_text"] = preset_scenarios["App Store"]
-                    st.rerun()
+                st.button(
+                    "🔋 Battery Drain",
+                    on_click=set_preset_scenario,
+                    args=(preset_scenarios["Battery Drain"],),
+                    use_container_width=True,
+                )
+                st.button(
+                    "🛡️ Security Issue",
+                    on_click=set_preset_scenario,
+                    args=(preset_scenarios["Security Issue"],),
+                    use_container_width=True,
+                )
+                st.button(
+                    "📱 App Store",
+                    on_click=set_preset_scenario,
+                    args=(preset_scenarios["App Store"],),
+                    use_container_width=True,
+                )
 
             with sc_cols2:
-                if st.button("🔄 iOS Update", use_container_width=True):
-                    st.session_state["customer_input_text"] = preset_scenarios["iOS Update"]
-                    st.rerun()
-                if st.button("💳 Billing Issue", use_container_width=True):
-                    st.session_state["customer_input_text"] = preset_scenarios["Billing Issue"]
-                    st.rerun()
-                if st.button("🔧 Hardware Repair", use_container_width=True):
-                    st.session_state["customer_input_text"] = preset_scenarios["Hardware Repair"]
-                    st.rerun()
+                st.button(
+                    "🔄 iOS Update",
+                    on_click=set_preset_scenario,
+                    args=(preset_scenarios["iOS Update"],),
+                    use_container_width=True,
+                )
+                st.button(
+                    "💳 Billing Issue",
+                    on_click=set_preset_scenario,
+                    args=(preset_scenarios["Billing Issue"],),
+                    use_container_width=True,
+                )
+                st.button(
+                    "🔧 Hardware Repair",
+                    on_click=set_preset_scenario,
+                    args=(preset_scenarios["Hardware Repair"],),
+                    use_container_width=True,
+                )
 
         # ---------------- RIGHT COLUMN: AI ANALYSIS & OUTPUTS ----------------
         with col_right:
             agent = load_agent()
 
-            # Only run inference when the Analyze button is explicitly clicked
-            if analyze_btn:
-                query_to_run = (user_query or "").strip()
+            # Run inference when Analyze button clicked or Quick Scenario selected
+            should_run = analyze_btn or st.session_state.pop("auto_analyze", False)
+            if should_run:
+                query_to_run = (st.session_state.get("customer_input_text", "") or user_query or "").strip()
                 if not query_to_run:
                     st.warning("Please type a customer message before analyzing.")
                 else:
