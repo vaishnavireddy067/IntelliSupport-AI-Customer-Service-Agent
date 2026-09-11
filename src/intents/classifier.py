@@ -11,8 +11,8 @@ import logging
 from typing import List, Tuple, Dict, Any, Optional
 import numpy as np
 
-# Ensure offline loading from local cache for sub-second latency
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
+if os.environ.get("FORCE_OFFLINE") == "1":
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression

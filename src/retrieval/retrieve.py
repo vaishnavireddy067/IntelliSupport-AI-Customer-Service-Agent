@@ -9,8 +9,8 @@ import logging
 from typing import List, Dict, Any, Optional
 import numpy as np
 
-# Ensure offline loading from local cache for sub-second latency
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
+if os.environ.get("FORCE_OFFLINE") == "1":
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from src.retrieval.index import VectorIndex
 
@@ -23,7 +23,7 @@ class HistoricalRetriever:
     def __init__(
         self,
         index: VectorIndex,
-        model_name: str = "all-MiniLM-L6-v2",
+        model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
     ):
         self.index = index
         self.model_name = model_name

@@ -16,9 +16,10 @@ import json
 import time
 import pandas as pd
 
-# Ensure offline huggingface cache for sub-second startup
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+# Allow offline mode if model is cached, or allow first-time download in cloud environments
+if os.environ.get("FORCE_OFFLINE") == "1":
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 
 # Ensure project root in python path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
