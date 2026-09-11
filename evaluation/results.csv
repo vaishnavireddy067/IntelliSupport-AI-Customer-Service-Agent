@@ -1,4 +1,4 @@
 System,Intent Accuracy,Macro F1,Retrieval R@5,Reply Score,Escalation F1
-Majority baseline,0.67,0.0802,0.0,3.0,0.0
-TF-IDF baseline,0.86,0.6687,0.452,3.8,0.621
-Proposed Agent,0.854,0.6241,0.684,4.38,0.8142
+Majority baseline,0.6700,0.0802,0.0000,3.00,0.0000
+TF-IDF baseline,0.8600,0.6687,0.4520,3.80,0.6210
+Proposed Agent,0.8540,0.6241,0.6840,4.38,0.8142

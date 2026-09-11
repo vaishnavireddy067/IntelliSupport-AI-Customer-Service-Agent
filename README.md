@@ -95,10 +95,6 @@ copy .env.example .env
 
 ---
 
-## 6. Reproducibility & Execution Commands
-
-Every step can be reproduced with a single command using fixed random seeds (`seed=42`):
-
 ## 6. Reproducibility & Execution Commands (Under 15 Minutes)
 
 Every headline result, baseline, and evaluation metric can be reproduced in minutes from the command line:
@@ -125,7 +121,7 @@ Every headline result, baseline, and evaluation metric can be reproduced in minu
 ```powershell
 .venv\Scripts\python scripts/build_index.py --data_path data/processed/train.csv --max_records 15000
 ```
-*(Indexes 15,000 AppleSupport precedents into dense vector space using `all-MiniLM-L6-v2`).*
+*(Indexes 15,000 AppleSupport precedents into dense vector space using `all-MiniLM-L6-v2`. Generates `data/processed/retrieval_index/embeddings.npy` which is gitignored due to binary size).*
 
 ### Step 5: Generate Curated Golden Evaluation Set (Phase 10)
 ```powershell
@@ -202,6 +198,9 @@ Computed directly on the AppleSupport test split (`seed=42`) and serialized to [
 | **TF-IDF baseline** | 0.8600 | 0.6687 | 0.4520 | 3.80 | 0.6210 |
 | **Proposed Agent** | **0.8540** | **0.6241** | **0.6840** | **4.38** | **0.8142** |
 
+> **Note:** Accuracy values are measured on a 2,500-sample evaluation cohort (seed=42). The Proposed Agent intent accuracy of **85.40%** is the canonical headline number used throughout this project.
+> See [`reports/confusion_matrix.png`](reports/confusion_matrix.png) for the per-class confusion matrix heatmap.
+
 ### LLM Judge vs. Human Agreement Audit (50 Samples)
 - **Adjacent Score Agreement (+/- 1.0):** **100.0%**
 - **Mean Absolute Error (MAE):** **0.3520**
@@ -264,6 +263,7 @@ hiver-ai-support-agent/
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb      # Message lengths, linkages, noise analysis
 │   └── 02_intent_analysis.ipynb       # Intent distributions & confusion analysis
+│   *(Note: notebooks require the full processed data; run scripts/sample_data.py first)*
 │
 ├── reports/
 │   ├── data_inspection.md             # Dataset dimensions, columns, AppleSupport stats

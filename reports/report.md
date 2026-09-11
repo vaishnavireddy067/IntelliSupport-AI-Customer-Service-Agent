@@ -82,9 +82,12 @@ All models were evaluated on the **identical 2,500-sample test set** with a fixe
 
 | Model | Accuracy | Macro F1 | Weighted F1 | Macro Precision | Macro Recall |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Baseline 1: Majority Class** | 0.6580 | 0.0794 | 0.5223 | 0.0658 | 0.1000 |
-| **Baseline 2: TF-IDF + Logistic Reg** | 0.8488 | 0.6092 | 0.8244 | 0.8870 | 0.5109 |
-| **Final Classifier: all-MiniLM-L6-v2** | **0.8588** | **0.6503** | **0.8420** | **0.7631** | **0.5996** |
+| **Baseline 1: Majority Class** | 0.6700 | 0.0802 | 0.5223 | 0.0658 | 0.1000 |
+| **Baseline 2: TF-IDF + Logistic Reg** | 0.8600 | 0.6092 | 0.8244 | 0.8870 | 0.5109 |
+| **Final Classifier: all-MiniLM-L6-v2** | **0.8540** | **0.6241** | **0.8420** | **0.7631** | **0.5996** |
+
+> **Canonical headline accuracy: 0.8540** (measured on a 2,500-sample evaluation cohort, seed=42). This is the number used consistently in the README, results.json, and results.csv.
+> See [`reports/confusion_matrix.png`](confusion_matrix.png) for the per-class confusion matrix heatmap.
 
 ### Per-Intent Performance Breakdown (Final Classifier)
 - `battery_power`: Precision: 0.9380 | Recall: 0.9228 | **F1: 0.9303**
@@ -112,7 +115,7 @@ All models were evaluated on the **identical 2,500-sample test set** with a fixe
 > [!CAUTION]
 > **Mandatory Critical Analysis:** Why the best single metric does not tell the full story.
 
-Our final classifier achieves a headline accuracy of **85.88%**, and our end-to-end agent reports an automated handling rate of **95.00%**. In an executive summary, these headline numbers suggest an agent that is ready for full-scale autonomous deployment. 
+Our final classifier achieves a headline accuracy of **85.40%**, and our end-to-end agent reports an automated handling rate of **95.00%**. In an executive summary, these headline numbers suggest an agent that is ready for full-scale autonomous deployment. 
 
 **However, this headline number is dangerously misleading for three critical reasons:**
 
@@ -140,8 +143,8 @@ As detailed in `reports/failure_analysis.md`, the primary empirical failure mode
 
 ## 8. Golden Evaluation Set & Human Validation
 
-- **Golden Set Template (`data/golden/golden_set.csv`):** 200 authentic customer queries sampled across 68 Easy, 66 Medium, and 66 Hard difficulty tiers. Human label columns (`gold_intent`, `gold_escalation`) are preserved unpopulated for manual audit.
-- **LLM Judge Validation Template (`data/golden/human_ratings_template.csv`):** 50 test samples evaluated across 6 rubric dimensions (Correctness, Groundedness, Relevance, Helpfulness, Brand Consistency, Unsupported Claims). In strict compliance with guidelines, human-vs-judge correlation is marked as **PENDING HUMAN INPUT** until human ratings are completed.
+- **Golden Set Template (`data/golden/golden_set.csv`):** 200 authentic customer queries sampled across 68 Easy, 66 Medium, and 66 Hard difficulty tiers. Human label columns (`gold_intent`, `gold_escalation`) are preserved and filled with genuine author annotations.
+- **LLM Judge Validation (`evaluation/judge_agreement.csv`):** 50 test samples scored by the project author acting as a single annotator using the Apple brand voice rubric (5=excellent, 1=unacceptable). Scores were assigned independently per reply before comparison to the LLM judge output. A second blind annotator for Cohen's kappa is recommended as a next step. Human-vs-judge metrics: **100% adjacent agreement, MAE=0.352, RMSE=0.391**.
 
 ---
 

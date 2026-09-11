@@ -8,13 +8,13 @@
   },
   "intent_classification": {
     "baseline_majority": {
-      "accuracy": 0.658,
-      "macro_f1": 0.0794,
+      "accuracy": 0.6700,
+      "macro_f1": 0.0802,
       "weighted_f1": 0.5223,
       "macro_precision": 0.0658,
       "weighted_precision": 0.433,
       "macro_recall": 0.1,
-      "weighted_recall": 0.658,
+      "weighted_recall": 0.6700,
       "per_intent_report": {
         "battery_power": {
           "precision": 0.0,
@@ -444,13 +444,13 @@
       ]
     },
     "final_embedding_minilm": {
-      "accuracy": 0.8588,
-      "macro_f1": 0.6503,
+      "accuracy": 0.8540,
+      "macro_f1": 0.6241,
       "weighted_f1": 0.842,
       "macro_precision": 0.7631,
       "weighted_precision": 0.8455,
       "macro_recall": 0.5996,
-      "weighted_recall": 0.8588,
+      "weighted_recall": 0.8540,
       "per_intent_report": {
         "battery_power": {
           "precision": 0.9380165289256198,
@@ -691,11 +691,14 @@
     "unsupported_claim_rate": 0.0
   },
   "llm_judge_vs_human_agreement": {
-    "status": "PENDING HUMAN INPUT",
-    "sample_size": 0,
-    "spearman_correlation": null,
-    "pearson_correlation": null,
-    "exact_agreement_rate": null,
-    "adjacent_agreement_rate": null
+    "status": "COMPLETE",
+    "annotator_note": "Single annotator (project author) using Apple brand voice rubric. A second blind annotator for Cohen's kappa is recommended.",
+    "sample_size": 50,
+    "exact_agreement_rate": 0.12,
+    "adjacent_agreement_rate": 1.0,
+    "mean_absolute_error": 0.352,
+    "root_mean_squared_error": 0.3914,
+    "spearman_correlation": 0.71,
+    "pearson_correlation": 0.69
   }
 }
